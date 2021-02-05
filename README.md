@@ -1,1 +1,1 @@
-![orange](https://upload.wikimedia.org/wikipedia/commons/7/72/Orange_Background.png)
+![orange](http://assets.prestashop2.com/sites/default/files/wysiwyg/4041-2.jpg)
