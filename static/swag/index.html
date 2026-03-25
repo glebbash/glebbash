@@ -26,7 +26,7 @@
     layout: "StandaloneLayout",
     requestInterceptor: (req) => {
       if (!req.url.startsWith("http://localhost") && !req.url.startsWith("/")) {
-        req.url = "https://swagger-ui-cors.deno.dev/proxy/" + req.url;
+        req.url = "/proxy/" + req.url;
       }
       return req;
     },
