@@ -1,0 +1,36 @@
+<!doctype html>
+
+<title>SWAG</title>
+
+<link rel="stylesheet" type="text/css" href="./assets/swagger-ui.css" />
+<script src="./assets/swagger-ui-bundle.js"></script>
+<script src="./assets/swagger-ui-standalone-preset.js"></script>
+
+<style>
+  html,
+  body {
+    margin: 0;
+  }
+</style>
+
+<div id="swagger-ui"></div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const url =
+    params.get("url") || "https://petstore3.swagger.io/api/v3/openapi.json";
+
+  SwaggerUIBundle({
+    url,
+    dom_id: "#swagger-ui",
+    presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+    layout: "StandaloneLayout",
+    requestInterceptor: (req) => {
+      if (!req.url.startsWith("http://localhost") && !req.url.startsWith("/")) {
+        req.url = "https://swagger-ui-cors.deno.dev/proxy/" + req.url;
+      }
+      return req;
+    },
+    showMutatedRequest: false,
+    showExtensions: true,
+  });
+</script>

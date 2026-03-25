@@ -1,0 +1,19 @@
+{
+  "name": "glebbash",
+  "main": "index.ts",
+  "scripts": {
+    "start": "node --watch index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glebbash/glebbash.git"
+  },
+  "type": "module",
+  "dependencies": {
+    "@hono/node-server": "^1.19.11",
+    "hono": "^4.12.9"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}

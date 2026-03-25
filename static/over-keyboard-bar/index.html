@@ -1,0 +1,88 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- functional -->
+<style>
+  body {
+    overflow: hidden; /* makes the overlay not lag behind on scroll */
+  }
+  .over-keyboard-bar {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    display: none;
+  }
+</style>
+
+<!-- pretty -->
+<style>
+  body {
+    margin: 0;
+    padding: 8px;
+  }
+  textarea {
+    width: 100%;
+    font-size: 18px;
+    padding: 10px;
+  }
+  .over-keyboard-bar {
+    background: black;
+    font-size: 18px;
+  }
+  .indent-btn {
+    font-weight: bold;
+    background-color: pink;
+    margin: 0;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+</style>
+
+<textarea
+  placeholder="Type something, notice the helper bar appearing on mobile."
+></textarea>
+<div class="over-keyboard-bar">
+  <button class="indent-btn">TAB</button>
+</div>
+
+<script>
+  main();
+
+  function main() {
+    setupOverKeyboardBar(document.querySelector(".over-keyboard-bar"));
+
+    const textarea = document.querySelector("textarea");
+    document.querySelector(".indent-btn").addEventListener("click", () => {
+      enterTab(textarea);
+    });
+  }
+
+  function setupOverKeyboardBar(bar) {
+    window.visualViewport.addEventListener("resize", updateOverlay);
+    window.visualViewport.addEventListener("scroll", updateOverlay);
+
+    function updateOverlay() {
+      const keyboardHeight = window.innerHeight - window.visualViewport.height;
+      if (keyboardHeight <= 0) {
+        bar.style.display = "none";
+        return;
+      }
+
+      bar.style.display = "block";
+      bar.style.bottom =
+        window.innerHeight -
+        (window.visualViewport.offsetTop + window.visualViewport.height) +
+        "px";
+    }
+  }
+
+  function enterTab(input, tab = "  ") {
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+
+    input.value =
+      input.value.substring(0, start) + tab + input.value.substring(end);
+    input.selectionStart = input.selectionEnd = start + tab.length;
+    input.focus();
+  }
+</script>

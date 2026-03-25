@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<title>GravSim</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<canvas id="canvas" width="640" height="480"></canvas>
+<style>
+  html,
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    touch-action: none;
+  }
+</style>
+<script type="module">
+  /** @type {HTMLCanvasElement} */
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const TIME_MULT = 5;
+  const G = 150;
+  const FLY_DIST = 60;
+  const MX = 100;
+  let WIDTH = 640;
+  let HEIGHT = 480;
+
+  function resizeCanvas() {
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  const objects = [];
+  window.objects = objects;
+
+  let spawning = false;
+  canvas.addEventListener("pointerdown", (event) => {
+    spawning = true;
+  });
+  canvas.addEventListener("pointerup", () => {
+    spawning = false;
+  });
+  canvas.addEventListener("pointermove", (event) => {
+    if (!spawning) return;
+    spawn(event);
+  });
+
+  function spawn(event) {
+    const pos = {
+      x: event.clientX - canvas.getBoundingClientRect().x,
+      y: event.clientY - canvas.getBoundingClientRect().y,
+    };
+
+    objects.push({
+      name: "???",
+      color: randomColor(),
+      size: 2,
+      mass: 1 * MX,
+      pos,
+      vel: randomVelocity(FLY_DIST),
+      trail: Array.from({ length: 10 }, () => ({})),
+    });
+
+    function randomVelocity(length) {
+      const angle = Math.random() * 2 * Math.PI;
+
+      return {
+        x: Math.cos(angle) * length,
+        y: Math.sin(angle) * length,
+      };
+    }
+  }
+
+  function update(delta) {
+    for (let i = 0; i < objects.length; i++) {
+      for (let j = i + 1; j < objects.length; j++) {
+        const a = objects[i];
+        const b = objects[j];
+
+        const dx = b.pos.x - a.pos.x;
+        const dy = b.pos.y - a.pos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < a.size + b.size) {
+          const totalMass = a.mass + b.mass;
+          const newVel = {
+            x: (a.vel.x * a.mass + b.vel.x * b.mass) / totalMass,
+            y: (a.vel.y * a.mass + b.vel.y * b.mass) / totalMass,
+          };
+          const newPos = {
+            x: (a.pos.x * a.mass + b.pos.x * b.mass) / totalMass,
+            y: (a.pos.y * a.mass + b.pos.y * b.mass) / totalMass,
+          };
+          const newSize = Math.sqrt(a.size ** 2 + b.size ** 2);
+
+          const merged = {
+            size: newSize,
+            mass: totalMass,
+            color: randomColor(),
+            pos: newPos,
+            vel: newVel,
+            trail: Array.from({ length: 10 }, () => ({})),
+          };
+
+          objects.splice(j, 1);
+          objects.splice(i, 1);
+          objects.push(merged);
+          i = -1;
+          break;
+        }
+      }
+    }
+
+    for (let i = 0; i < objects.length; i++) {
+      const obj1 = objects[i];
+      let acc = { x: 0, y: 0 };
+
+      for (let j = 0; j < objects.length; j++) {
+        if (i === j) continue;
+
+        const obj2 = objects[j];
+        const dx = obj2.pos.x - obj1.pos.x;
+        const dy = obj2.pos.y - obj1.pos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const force = (G * obj1.mass * obj2.mass) / (distance * distance);
+        acc.x += (force * dx) / distance / obj1.mass;
+        acc.y += (force * dy) / distance / obj1.mass;
+      }
+
+      obj1.vel.x += acc.x * delta;
+      obj1.vel.y += acc.y * delta;
+    }
+
+    for (const obj of objects) {
+      if (obj.trail) {
+        obj.trail.shift();
+        obj.trail.push({ ...obj.pos });
+      }
+      obj.pos.x += obj.vel.x * delta;
+      obj.pos.y += obj.vel.y * delta;
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    for (const obj of objects) {
+      if (obj.trail) {
+        ctx.beginPath();
+        ctx.lineWidth = obj.size / 4;
+        ctx.strokeStyle = obj.color ?? "white";
+
+        for (const t of obj.trail) {
+          if (t.x !== undefined) {
+            ctx.lineTo(t.x, t.y);
+          }
+        }
+
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.fillStyle = obj.color ?? "white";
+      ctx.ellipse(obj.pos.x, obj.pos.y, obj.size, obj.size, 0, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }
+
+  window.requestAnimationFrame(tick);
+  function tick() {
+    update(0.016 * TIME_MULT);
+    draw();
+
+    window.requestAnimationFrame(tick);
+  }
+
+  function randomColor() {
+    return `#${Math.floor(Math.random() * 16777215)
+      .toString(16)
+      .padStart(6, "0")}`;
+  }
+</script>

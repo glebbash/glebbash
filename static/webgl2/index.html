@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WebGL2</title>
+
+<style>
+  html,
+  body {
+    margin: 0;
+  }
+  body {
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+</style>
+
+<script src="./shader-runner.js" type="module"></script>
+<shader-runner
+  animate
+  style="width: min(100vw, 100vh); height: min(100vw, 100vh)"
+/>
+<!-- hot reload -->
+<!-- <script src="./shaders/_scratch.frag"></script> -->
+
+<script>
+  let shaderIndex = 0;
+  const shaders = [
+    // "./shaders/_scratch.frag",
+    "./shaders/shiny.frag",
+    "./shaders/inverse-shiny.frag",
+    "./shaders/siren.frag",
+    "./shaders/radar.frag",
+    "./shaders/lavalamp.frag",
+    "./shaders/fusion.frag",
+  ];
+  const shaderRunner = document.querySelector("shader-runner");
+  shaderRunner.setAttribute("frag-src", shaders[0]);
+
+  document.body.addEventListener("click", (e) => {
+    if (e.target !== document.body) {
+      return;
+    }
+    const nextShaderUrl = shaders[++shaderIndex % shaders.length];
+    shaderRunner.setAttribute("frag-src", nextShaderUrl);
+  });
+</script>
