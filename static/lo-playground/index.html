@@ -1,12 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <title>LO Playground</title>
 <link rel="icon" href="./lo.svg" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link href="https://cdn.jsdelivr.net/npm/beercss@3.5.1/dist/cdn/beer.min.css" rel="stylesheet"/>
-<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.5.1/dist/cdn/beer.min.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.0/dist/cdn/material-dynamic-colors.min.js"></script>
+<link
+  href="https://cdn.jsdelivr.net/npm/beercss@3.5.1/dist/cdn/beer.min.css"
+  rel="stylesheet"
+/>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/beercss@3.5.1/dist/cdn/beer.min.js"
+></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.0/dist/cdn/material-dynamic-colors.min.js"
+></script>
 
 <body class="dark">
   <main class="responsive">
@@ -16,11 +25,25 @@
       </i>
       Playground
       <div class="right-align responsive">
+        <button
+          id="execButton"
+          class="small transparent border no-margin"
+          disabled
+        >
+          <i>play_arrow</i>
+          <span>Execute</span>
+        </button>
         <button class="small transparent border" onclick="samplesDialog.show()">
           <i class="no-padding">arrow_drop_down</i>
         </button>
       </div>
     </h4>
+    <p style="color: gray">
+      // NOTE: This uses a pretty old version of the language. I plan to make
+      this playground load a current compiler version and samples from GitHub
+      and improve the editor with syntax highlighting etc, but just can't find
+      some time and motivation.
+    </p>
     <div class="space"></div>
     <div id="content">
       <div class="field textarea border extra medium-height">
@@ -35,21 +58,19 @@
           "
         ></textarea>
       </div>
-      <button
-        id="execButton"
-        class="responsive transparent border no-margin"
-        disabled
-      >
-        <i>play_arrow</i>
-        <span>Execute</span>
-      </button>
       <dialog id="samplesDialog" class="bottom">
         <h6>Select an example:</h6>
         <div class="space"></div>
-        <a onclick="selectSample(event.target.innerHTML.trim())" class="row wave round">
+        <a
+          onclick="selectSample(event.target.innerHTML.trim())"
+          class="row wave round"
+        >
           Hello World
         </a>
-        <a onclick="selectSample(event.target.innerHTML.trim())" class="row wave round">
+        <a
+          onclick="selectSample(event.target.innerHTML.trim())"
+          class="row wave round"
+        >
           Factorial
         </a>
         <nav class="right-align no-space">
@@ -107,13 +128,18 @@
   // handle tab key
   sourceInput.onkeydown = function (e) {
     if (e.keyCode === 9) {
-      this.setRangeText("    ", this.selectionStart, this.selectionStart, "end");
+      this.setRangeText(
+        "    ",
+        this.selectionStart,
+        this.selectionStart,
+        "end",
+      );
       return false;
     }
   };
 
   const LO_COMPILER_MODULE = await WebAssembly.compile(
-    await fetch(`./lo.wasm`).then((r) => r.arrayBuffer())
+    await fetch(`./lo.wasm`).then((r) => r.arrayBuffer()),
   );
 
   execButton.disabled = false;
