@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#8bd5e8" />
+    <title>Stevens</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body,
+      #canvas-container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        background: #8bd5e8;
+        color: #173d47;
+        font-family: system-ui, sans-serif;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      #canvas-container,
+      canvas {
+        position: fixed;
+        inset: 0;
+      }
+
+      canvas {
+        display: block;
+      }
+
+      .controls {
+        position: fixed;
+        bottom: max(22px, env(safe-area-inset-bottom));
+        left: 50%;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(3, 72px);
+        grid-template-rows: repeat(3, 72px);
+        gap: 0;
+        transform: translateX(-50%);
+      }
+
+      .controls button {
+        display: grid;
+        place-items: center;
+        width: 72px;
+        height: 72px;
+        border: 1px solid #ffffffa8;
+        border-radius: 0;
+        background: #173d4754;
+        color: white;
+        font: 700 29px/1 system-ui, sans-serif;
+        text-shadow: 0 1px 3px #102a36a8;
+        box-shadow: 0 3px 12px #17495826;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .controls button:active {
+        background: #173d47a3;
+      }
+
+      .controls::before {
+        content: "";
+        grid-column: 2;
+        grid-row: 2;
+        border: 1px solid #ffffffa8;
+        background: #173d4754;
+      }
+
+      [data-action="left"] {
+        grid-column: 1;
+        grid-row: 2;
+        border-radius: 22px 0 0 22px !important;
+      }
+
+      [data-action="forward"] {
+        grid-column: 2;
+        grid-row: 1;
+        border-radius: 22px 22px 0 0 !important;
+      }
+
+      [data-action="right"] {
+        grid-column: 3;
+        grid-row: 2;
+        border-radius: 0 22px 22px 0 !important;
+      }
+
+      [data-action="back"] {
+        grid-column: 2;
+        grid-row: 3;
+        border-radius: 0 0 22px 22px !important;
+      }
+      .side-button {
+        position: fixed;
+        z-index: 2;
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border: 1px solid #ffffffa8;
+        border-radius: 16px;
+        background: #173d4754;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .side-button:active {
+        background: #173d47a3;
+      }
+
+      .side-button:disabled {
+        opacity: 0.3;
+      }
+
+      #undo {
+        left: max(20px, env(safe-area-inset-left));
+        bottom: max(22px, env(safe-area-inset-bottom));
+      }
+
+      #redo {
+        right: max(20px, env(safe-area-inset-right));
+        bottom: max(22px, env(safe-area-inset-bottom));
+      }
+
+      #reset {
+        top: max(20px, env(safe-area-inset-top));
+        right: max(20px, env(safe-area-inset-right));
+      }
+    </style>
+    <script type="module" crossorigin src="/stevens/assets/index-SagcjK50.js"></script>
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+    <nav class="controls" aria-label="Movement controls">
+      <button type="button" data-action="left" aria-label="Turn left"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(-90deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
+      <button type="button" data-action="forward" aria-label="Walk forward"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(0deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
+      <button type="button" data-action="right" aria-label="Turn right"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(90deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
+      <button type="button" data-action="back" aria-label="Walk backward"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
+    </nav>
+    <button type="button" id="undo" class="side-button" aria-label="Undo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 0 12h-3" /></svg></button>
+    <button type="button" id="redo" class="side-button" aria-label="Redo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5" /><path d="M20 9H10a6 6 0 0 0 0 12h3" /></svg></button>
+    <button type="button" id="reset" class="side-button" aria-label="Reset"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></svg></button>
+  </body>
+</html>
