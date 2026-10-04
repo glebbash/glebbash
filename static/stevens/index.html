@@ -44,64 +44,74 @@
         bottom: max(22px, env(safe-area-inset-bottom));
         left: 50%;
         z-index: 2;
-        display: grid;
-        grid-template-columns: repeat(3, 72px);
-        grid-template-rows: repeat(3, 72px);
-        gap: 0;
-        transform: translateX(-50%);
-      }
-
-      .controls button {
-        display: grid;
-        place-items: center;
-        width: 72px;
-        height: 72px;
+        width: 160px;
+        height: 160px;
         border: 1px solid #ffffffa8;
-        border-radius: 0;
+        border-radius: 29px;
+        overflow: hidden;
         background: #173d4754;
-        color: white;
-        font: 700 29px/1 system-ui, sans-serif;
-        text-shadow: 0 1px 3px #102a36a8;
         box-shadow: 0 3px 12px #17495826;
+        transform: translateX(-50%);
         touch-action: none;
         -webkit-tap-highlight-color: transparent;
       }
 
-      .controls button:active {
+      /* the diagonal dividers between the four wedges */
+      .controls::before,
+      .controls::after {
+        content: "";
+        position: absolute;
+        left: -21%;
+        top: calc(50% - 1px);
+        width: 142%;
+        height: 2px;
+        background: #ffffffa8;
+        transform: rotate(45deg);
+        pointer-events: none;
+      }
+
+      .controls::after {
+        transform: rotate(-45deg);
+      }
+
+      .controls [data-action] {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        pointer-events: none;
+      }
+
+      .controls [data-action].pressed {
         background: #173d47a3;
       }
 
-      .controls::before {
-        content: "";
-        grid-column: 2;
-        grid-row: 2;
-        border: 1px solid #ffffffa8;
-        background: #173d4754;
-      }
-
-      [data-action="left"] {
-        grid-column: 1;
-        grid-row: 2;
-        border-radius: 22px 0 0 22px !important;
+      .controls svg {
+        position: absolute;
       }
 
       [data-action="forward"] {
-        grid-column: 2;
-        grid-row: 1;
-        border-radius: 22px 22px 0 0 !important;
+        clip-path: polygon(50% 50%, 0 0, 100% 0);
       }
 
       [data-action="right"] {
-        grid-column: 3;
-        grid-row: 2;
-        border-radius: 0 22px 22px 0 !important;
+        clip-path: polygon(50% 50%, 100% 0, 100% 100%);
       }
 
       [data-action="back"] {
-        grid-column: 2;
-        grid-row: 3;
-        border-radius: 0 0 22px 22px !important;
+        clip-path: polygon(50% 50%, 100% 100%, 0 100%);
       }
+
+      [data-action="left"] {
+        clip-path: polygon(50% 50%, 0 100%, 0 0);
+      }
+
+      /* arrows are 30px, close to the pad edge */
+      [data-action="forward"] svg { top: 18px; }
+      [data-action="back"] svg { bottom: 18px; }
+      [data-action="left"] svg { left: 18px; }
+      [data-action="right"] svg { right: 18px; }
+
       .side-button {
         position: fixed;
         z-index: 2;
@@ -129,28 +139,149 @@
         bottom: max(22px, env(safe-area-inset-bottom));
       }
 
-      #redo {
+      #menu-button {
         right: max(20px, env(safe-area-inset-right));
         bottom: max(22px, env(safe-area-inset-bottom));
       }
 
-      #reset {
-        top: max(20px, env(safe-area-inset-top));
+      #redo {
+        display: none;
+        left: max(20px, env(safe-area-inset-left));
+        bottom: calc(max(22px, env(safe-area-inset-bottom)) + 56px);
+      }
+
+      body.menu-open #redo {
+        display: grid;
+      }
+
+      #menu {
+        position: fixed;
+        z-index: 2;
+        display: none;
+        flex-direction: column;
+        gap: 6px;
         right: max(20px, env(safe-area-inset-right));
+        bottom: calc(max(22px, env(safe-area-inset-bottom)) + 56px);
+      }
+
+      #menu.open {
+        display: flex;
+      }
+
+      #menu button {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        border: 1px solid #ffffffa8;
+        border-radius: 16px;
+        background: #173d4754;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      #menu button:active {
+        background: #173d47d9;
+      }
+
+      #menu button:disabled {
+        opacity: 0.3;
+      }
+
+      .toolbar,
+      .level-bar {
+        position: fixed;
+        z-index: 2;
+        display: none;
+        gap: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .level-bar {
+        bottom: max(22px, env(safe-area-inset-bottom));
+      }
+
+      .toolbar {
+        bottom: calc(max(22px, env(safe-area-inset-bottom)) + 52px);
+      }
+
+      .toolbar button,
+      .level-bar button {
+        display: grid;
+        place-items: center;
+        width: 46px;
+        height: 46px;
+        padding: 0;
+        border: 1px solid #ffffffa8;
+        border-radius: 14px;
+        background: #173d4754;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .toolbar button.active {
+        background: #173d47d9;
+        border-color: white;
+      }
+
+      #load-select {
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: max(22px, env(safe-area-inset-bottom));
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      body.editing .toolbar,
+      body.editing .level-bar {
+        display: flex;
+      }
+
+      body.editing .controls,
+      body.editing #undo,
+      body.editing #redo,
+      body.editing #menu-button,
+      body.editing #menu {
+        display: none;
       }
     </style>
-    <script type="module" crossorigin src="/stevens/assets/index-SagcjK50.js"></script>
+    <script type="module" crossorigin src="/stevens/assets/index-B49vY18m.js"></script>
   </head>
   <body>
     <div id="canvas-container"></div>
     <nav class="controls" aria-label="Movement controls">
-      <button type="button" data-action="left" aria-label="Turn left"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(-90deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
-      <button type="button" data-action="forward" aria-label="Walk forward"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(0deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
-      <button type="button" data-action="right" aria-label="Turn right"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(90deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
-      <button type="button" data-action="back" aria-label="Walk backward"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></button>
+      <div data-action="left"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(-90deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></div>
+      <div data-action="forward"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(0deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></div>
+      <div data-action="right"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(90deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></div>
+      <div data-action="back"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg)"><path d="M12 19V5M5 12l7-7 7 7" /></svg></div>
     </nav>
-    <button type="button" id="undo" class="side-button" aria-label="Undo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 0 12h-3" /></svg></button>
+    <button type="button" id="menu-button" class="side-button" aria-label="Menu"><svg viewBox="0 0 24 24" width="26" height="26" fill="white"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+    <nav id="menu" aria-label="Menu">
+      <button type="button" id="reset" aria-label="Reset"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></svg></button>
+      <button type="button" id="mode" aria-label="Switch controls"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="6" height="18" rx="2"/><rect x="14" y="3" width="6" height="18" rx="2"/><path d="M10 12h4"/></svg></button>
+      <button type="button" id="edit" aria-label="Edit"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z" /></svg></button>
+    </nav>
     <button type="button" id="redo" class="side-button" aria-label="Redo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5" /><path d="M20 9H10a6 6 0 0 0 0 12h3" /></svg></button>
-    <button type="button" id="reset" class="side-button" aria-label="Reset"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></svg></button>
+    <button type="button" id="undo" class="side-button" aria-label="Undo"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 0 12h-3" /></svg></button>
+    <nav class="toolbar" aria-label="Editor tools">
+      <button type="button" data-tool="land" aria-label="Land"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" fill="#8bc34a" stroke="none"/></svg></button>
+      <button type="button" data-tool="grill" aria-label="Grill"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" fill="#555" stroke="none"/><path d="M8 7v10M12 7v10M16 7v10" stroke="#e53935"/></svg></button>
+      <button type="button" data-tool="sausage-h" aria-label="Horizontal sausage"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="8" width="22" height="8" rx="4" fill="#c0713f" stroke="none"/></svg></button>
+      <button type="button" data-tool="sausage-v" aria-label="Vertical sausage"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="1" width="8" height="22" rx="4" fill="#c0713f" stroke="none"/></svg></button>
+      <button type="button" data-tool="player" aria-label="Player"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="7" fill="#e8d5a0" stroke="none"/><path d="M12 7V2" stroke="#3a2a14" stroke-width="3"/></svg></button>
+      <button type="button" data-tool="erase" aria-label="Erase"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#e53935" stroke-width="3.5" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    </nav>
+    <nav class="level-bar" aria-label="Level tools">
+      <button type="button" id="level-save" aria-label="New level"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" id="level-load" aria-label="Select level"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="white"/><circle cx="4.5" cy="12" r="1" fill="white"/><circle cx="4.5" cy="18" r="1" fill="white"/></svg></button>
+      <button type="button" id="level-rename" aria-label="Rename level"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20L12 4l7 16M7.8 14h8.4"/></svg></button>
+      <button type="button" id="level-import" aria-label="Import levels"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg></button>
+      <button type="button" id="level-export" aria-label="Export levels"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M4 21h16"/></svg></button>
+      <button type="button" id="edit-close" aria-label="Done"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg></button>
+    </nav>
+    <select id="load-select" aria-label="Load level"></select>
   </body>
 </html>
