@@ -2,7 +2,8 @@
   "name": "glebbash",
   "main": "index.ts",
   "scripts": {
-    "start": "node --watch index.ts"
+    "start": "node --watch index.ts",
+    "start:prod": "npx wrangler dev"
   },
   "repository": {
     "type": "git",
@@ -14,6 +15,7 @@
     "hono": "^4.12.9"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0"
+    "@types/node": "^25.9.9",
+    "wrangler": "^4.156.2"
   }
 }

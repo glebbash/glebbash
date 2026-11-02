@@ -34,5 +34,5 @@ app.notFound((ctx) => {
 });
 
 serve(app, (info) => {
-  console.log(`server started on port ${info.port}`);
+  console.log(`server started on http://localhost:${info.port}`);
 });
